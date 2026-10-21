@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JobTailor - AI Resume & Cover Letter</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<nav class="app-nav">
+  <a href="#" class="nav-brand">JobTailor</a>
+  <div class="nav-links">
+    <button class="nav-link active" data-nav="profile">My Profile</button>
+    <button class="nav-link" data-nav="create">Create</button>
+    <button class="nav-link" data-nav="history">Documents</button>
+  </div>
+  <span class="nav-profile-status" id="profileStatus"></span>
+</nav>
+
+<div id="view-profile" class="view active">
+  <div class="profile-header"><h2>My Profile</h2><span class="save-status" id="profileSaved">All changes saved</span></div>
+  <div class="profile-card">
+    <h3>Personal Details</h3>
+    <div class="form-row"><div class="form-group"><label>Full Name *</label><input type="text" id="pf_name" placeholder="John Doe"></div><div class="form-group"><label>Email *</label><input type="email" id="pf_email" placeholder="john@example.com"></div></div>
+    <div class="form-row"><div class="form-group"><label>Phone</label><input type="tel" id="pf_phone" placeholder="+1 555 123 4567"></div><div class="form-group"><label>Location</label><input type="text" id="pf_location" placeholder="New York, NY"></div></div>
+    <div class="form-row"><div class="form-group"><label>LinkedIn</label><input type="url" id="pf_linkedin" placeholder="https://linkedin.com/in/johndoe"></div><div class="form-group"><label>GitHub / Portfolio URL <span class="optional-label">(optional)</span></label><input type="text" id="pf_github" placeholder="https://github.com/you or your portfolio site"></div></div>
+  </div>
+  <div class="profile-card"><h3>Professional Summary <span class="optional-label">(optional)</span></h3><div class="form-group"><textarea id="pf_summary" rows="3" placeholder="Brief overview of your experience..."></textarea></div></div>
+  <div class="profile-card"><h3>Skills</h3><div class="form-group"><textarea id="pf_skills" rows="2" placeholder="e.g. Project Management, Customer Service, Excel, Nursing, Sales — any field welcome"></textarea></div></div>
+  <div class="profile-card"><h3>Education</h3><div id="profileEducation"></div><button type="button" class="btn btn-outline btn-sm" data-action="addProfileEducation" style="margin-top:8px">+ Add Education</button></div>
+  <div class="profile-card"><h3>Experience <span class="optional-label">(optional)</span></h3><div id="profileExperience"></div><button type="button" class="btn btn-outline btn-sm" data-action="addProfileExperience" style="margin-top:8px">+ Add Experience</button></div>
+  <div class="profile-card"><h3>Projects <span class="optional-label">(optional)</span></h3><p style="font-size:13px;color:#64748b;margin-bottom:8px">Each project is rendered as its own section on the CV, with the details as bullet points.</p><div id="profileProjects"></div><button type="button" class="btn btn-outline btn-sm" data-action="addProfileProject" style="margin-top:8px">+ Add Project</button></div>
+  <div class="profile-card"><h3>Certifications <span class="optional-label">(optional)</span></h3><div class="form-group"><textarea id="pf_certs" rows="2" placeholder="e.g. PMP, RN License, ServSafe, Google Career Certificate"></textarea></div></div>
+</div>
+<div id="view-create" class="view">
+  <h2 style="font-size:22px;font-weight:700;margin-bottom:16px">Create Application</h2>
+  <div class="profile-card"><p style="font-size:14px;color:#64748b">Your saved profile is ready</p><p id="profileSummaryStats" style="font-size:13px;color:#1e293b;margin-top:4px"></p></div>
+  <div class="profile-card">
+    <h3>Job Description</h3>
+    <div class="form-group"><label>Job Posting URL <span class="optional-label">(optional)</span></label><input type="url" id="cr_job_url" placeholder="https://linkedin.com/jobs/view/..."></div>
+    <div class="form-group"><label>Paste Job Description <span class="optional-label">(recommended if URL fails)</span></label><textarea id="cr_job_text" rows="6" placeholder="Copy and paste the full job description here..."></textarea></div>
+    <button class="btn btn-primary" id="analyzeBtn" data-action="analyzeJob">Analyze Job Match</button>
+  </div>
+</div>
+
+<div id="view-analysis" class="view">
+  <button class="btn btn-outline btn-sm" data-nav="" style="margin-bottom:16px">Back to Create</button>
+  <div class="analysis-card" id="analysisResult">
+    <div class="analysis-header"><div><h2 id="analysisJobTitle">Analyzing...</h2><p id="analysisCompany" style="color:#64748b"></p></div><div class="match-gauge match-medium" id="matchGauge">--%</div></div>
+    <div id="matchSkills" style="margin-bottom:16px"></div>
+    <div id="matchResponsibilities" style="margin-bottom:12px"></div>
+    <p class="match-note">This score is informational and does not predict hiring decisions.</p>
+    <div class="generate-btns">
+      <button class="btn btn-primary" data-action="generateDocs" data-arg="">Generate Both</button>
+      <button class="btn btn-outline" data-action="generateDocs" data-arg="">Resume Only</button>
+      <button class="btn btn-outline" data-action="generateDocs" data-arg="">Cover Letter Only</button>
+    </div>
+  </div>
+</div>
+<div id="view-editor" class="view">
+  <div class="editor-layout">
+    <div class="editor-sidebar">
+      <h3>Template</h3>
+      <select class="template-select" id="templateSelect" onchange='changeTemplate()'>
+        <option value="ats-minimal">Minimal ATS</option>
+        <option value="modern">Modern</option>
+        <option value="traditional">Traditional</option>
+      </select>
+      <h3>Sections</h3>
+      <label><input type="checkbox" checked data-section="showSummary"> Summary</label>
+      <label><input type="checkbox" checked data-section="showExperience"> Experience</label>
+      <label><input type="checkbox" checked data-section="showEducation"> Education</label>
+      <label><input type="checkbox" checked data-section="showSkills"> Skills</label>
+      <label><input type="checkbox" checked data-section="showProjects"> Projects / Portfolio</label>
+    </div>
+    <div class="editor-main">
+      <div class="editor-toolbar">
+        <button class="btn btn-outline btn-sm" data-nav="">Back</button>
+        <button class="btn btn-outline btn-sm" data-action="regenerateSection">Regenerate</button>
+        <a class="btn btn-primary btn-sm" href="/download/resume" target="_blank">Resume PDF</a>
+      </div>
+      <div class="editor-preview"><iframe id="editorFrame" srcdoc="Loading..."></iframe></div>
+    </div>
+  </div>
+</div>
+<div id="view-history" class="view">
+  <h2 style="font-size:22px;font-weight:700;margin-bottom:16px">Documents</h2>
+  <p style="color:#64748b;margin-bottom:20px">Your generated CVs and cover letters</p>
+  <div class="history-list" id="historyList"></div>
+  <div class="empty-state" id="historyEmpty" style="display:none"><p>No documents generated yet.</p><p>Create your first application to get started!</p></div>
+</div>
+
+<script src="/js/app.js"></script>
+</body>
+</html>

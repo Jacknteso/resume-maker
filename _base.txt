@@ -1,0 +1,164 @@
+const OpenAI = require('openai');
+
+// Groq provides a free, OpenAI-compatible API with Llama 3 70B
+const groq = new OpenAI({
+  apiKey: process.env.GROQ_API_KEY,
+  baseURL: 'https://api.groq.com/openai/v1'
+});
+
+/**
+ * Build a resume tailored to the job description.
+ * Returns structured data for the ATS-friendly template.
+ */
+async function generateResume(userData, jobDescription) {
+  const prompt = buildResumePrompt(userData, jobDescription);
+
+  const response = await groq.chat.completions.create({
+    model: 'openai/gpt-oss-120b',
+    temperature: 0.7,
+    max_tokens: 3000,
+    messages: [
+      {
+        role: 'system',
+        content: `You are a professional resume writer and career coach. 
+You craft ATS-friendly resumes that are tailored to specific job descriptions.
+Always return valid JSON with the exact structure requested.
+Use action verbs, quantify achievements where possible, and mirror keywords from the job description.`
+      },
+      { role: 'user', content: prompt }
+    ]
+  });
+
+  const content = response.choices[0].message.content;
+
+  // Groq may wrap JSON in markdown code blocks — strip them
+  const jsonStr = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+  const parsed = JSON.parse(jsonStr);
+
+  return {
+    tailoredSummary: parsed.summary || userData.summary,
+    tailoredExperience: parsed.experience || userData.experience,
+    tailoredSkills: parsed.skills || userData.skills,
+    keywords: parsed.keywords || []
+  };
+}
+
+/**
+ * Build a personalized cover letter for the job application.
+ */
+async function generateCoverLetter(userData, jobDescription) {
+  const prompt = `Write a professional, compelling cover letter for the following job application.
+
+CANDIDATE INFORMATION:
+- Name: ${userData.personal.full_name}
+- Email: ${userData.personal.email}
+- Phone: ${userData.personal.phone}
+- Location: ${userData.personal.location}
+- LinkedIn: ${userData.personal.linkedin || 'N/A'}
+
+CANDIDATE SUMMARY:
+${userData.summary}
+
+EDUCATION:
+${userData.education.map(e => `- ${e.degree} in ${e.field}, ${e.school} (${e.start} - ${e.end})`).join('\n')}
+
+WORK EXPERIENCE:
+${userData.experience.map(e => `- ${e.title} at ${e.company} (${e.start} - ${e.end})\n  ${e.description}`).join('\n')}
+
+SKILLS: ${userData.skills}
+
+${jobDescription ? `JOB DESCRIPTION:\n${jobDescription}` : 'No job description was provided. Write a general professional cover letter.'}
+
+---
+Write the cover letter with:
+1. A strong opening paragraph that mentions the specific role and why you're excited about it
+2. 1-2 body paragraphs highlighting relevant experience and skills that match the job requirements
+3. A closing paragraph with a call to action
+4. Keep it under 400 words
+5. Use a professional but personable tone
+6. Mirror keywords from the job description naturally`;
+
+  const response = await groq.chat.completions.create({
+    model: 'openai/gpt-oss-120b',
+    temperature: 0.7,
+    max_tokens: 1500,
+    messages: [
+      {
+        role: 'system',
+        content: `You are a professional cover letter writer. 
+Write compelling, personalized cover letters that help candidates stand out.
+Be specific, avoid generic phrases, and tailor the content to the job description.
+Return ONLY the cover letter text, no headers or labels.`
+      },
+      { role: 'user', content: prompt }
+    ]
+  });
+
+  const letterText = response.choices[0].message.content.trim();
+
+  // Parse the letter into paragraphs
+  const paragraphs = letterText
+    .split(/\n\s*\n/)
+    .map(p => p.trim())
+    .filter(p => p.length > 0);
+
+  return {
+    paragraphs,
+    rawText: letterText
+  };
+}
+
+function buildResumePrompt(userData, jobDescription) {
+  return `Create a tailored, ATS-optimized resume based on this candidate profile and job description.
+
+CANDIDATE PROFILE:
+Name: ${userData.personal.full_name}
+Email: ${userData.personal.email}
+Phone: ${userData.personal.phone}
+Location: ${userData.personal.location}
+LinkedIn: ${userData.personal.linkedin || 'N/A'}
+
+Summary: ${userData.summary}
+
+Education:
+${userData.education.map(e => `- ${e.degree} in ${e.field} from ${e.school} (${e.start} - ${e.end})${e.gpa ? ', GPA: ' + e.gpa : ''}`).join('\n')}
+
+Work Experience:
+${userData.experience.map(e => `- ${e.title} at ${e.company} (${e.start} - ${e.end})\n  Description: ${e.description}`).join('\n')}
+
+Skills: ${userData.skills}
+Certifications: ${userData.certifications || 'None'}
+Projects: ${userData.projects || 'None'}
+
+${jobDescription ? `JOB DESCRIPTION:\n${jobDescription}` : 'No job description provided. Optimize the resume for general use.'}
+
+---
+Return a JSON object with this exact structure:
+{
+  "summary": "A tailored professional summary (2-3 sentences) that highlights relevant experience for this specific job",
+  "experience": [
+    {
+      "company": "company name",
+      "title": "job title",
+      "start": "start date",
+      "end": "end date",
+      "bullets": ["bullet point 1 with action verb and quantified result", "bullet point 2", ...]
+    }
+  ],
+  "skills": "Comma-separated skills, reordered to prioritize those matching the job description",
+  "keywords": ["keyword1", "keyword2", ...]
+}
+
+IMPORTANT: Return ONLY the raw JSON object, no markdown code fences, no extra text.
+
+Make sure to:
+1. Mirror keywords from the job description
+2. Use strong action verbs
+3. Quantify achievements where possible
+4. Keep bullet points concise (1-2 lines each)
+5. Prioritize the most relevant experience`;
+}
+
+
+
+

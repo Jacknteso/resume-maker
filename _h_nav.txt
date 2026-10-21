@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JobTailor - AI Resume & Cover Letter</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<nav class="app-nav">
+  <a href="#" class="nav-brand">📄 JobTailor</a>
+  <div class="nav-links">
+    <button class="nav-link active" onclick='navigate('profile')'>My Profile</button>
+    <button class="nav-link" onclick='navigate('create')'>Create</button>
+    <button class="nav-link" onclick='navigate('history')'>Documents</button>
+  </div>
+  <span class="nav-profile-status" id="profileStatus"></span>
+</nav>

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Resume Maker — Documentation</title>
+  <style>
+    @page { margin: 0.75in; size: A4; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; font-size: 11pt; line-height: 1.6; color: #1e293b; }
+    h1 { font-size: 28pt; color: #0f172a; margin-bottom: 4px; }
+    h2 { font-size: 18pt; color: #1e40af; margin-top: 28px; margin-bottom: 8px; border-bottom: 2px solid #dbeafe; padding-bottom: 4px; }
+    h3 { font-size: 13pt; color: #334155; margin-top: 18px; margin-bottom: 6px; }
+    h4 { font-size: 11pt; color: #475569; margin-top: 12px; margin-bottom: 4px; }
+    p { margin-bottom: 8px; }
+    .subtitle { font-size: 14pt; color: #64748b; margin-bottom: 20px; }
+    .cover { text-align: center; padding-top: 120px; page-break-after: always; }
+    .cover h1 { font-size: 36pt; margin-bottom: 8px; }
+    .cover .version { font-size: 14pt; color: #64748b; margin-bottom: 40px; }
+    .cover .date { font-size: 12pt; color: #94a3b8; }
+    table { width: 100%; border-collapse: collapse; margin: 10px 0 16px; font-size: 10pt; }
+    th { background: #f1f5f9; text-align: left; padding: 8px 10px; border: 1px solid #e2e8f0; font-weight: 600; color: #334155; }
+    td { padding: 8px 10px; border: 1px solid #e2e8f0; vertical-align: top; }
+    tr:nth-child(even) td { background: #f8fafc; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background: #f1f5f9; padding: 1px 5px; border-radius: 3px; font-size: 10pt; color: #be185d; }
+    pre { background: #1e293b; color: #e2e8f0; padding: 14px 18px; border-radius: 8px; font-size: 9.5pt; line-height: 1.5; overflow-x: auto; margin: 10px 0 16px; font-family: 'Consolas', 'Courier New', monospace; }
+    pre code { background: none; color: inherit; padding: 0; }
+    ul, ol { margin: 6px 0 12px 24px; }
+    li { margin-bottom: 4px; }
+    .section { page-break-inside: avoid; }
+    .page-break { page-break-before: always; }
+    .note { background: #eff6ff; border-left: 4px solid #2563eb; padding: 10px 14px; margin: 10px 0 16px; border-radius: 0 6px 6px 0; font-size: 10pt; }
+    .warning { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 10px 14px; margin: 10px 0 16px; border-radius: 0 6px 6px 0; font-size: 10pt; }
+    .tree { font-family: 'Consolas', monospace; font-size: 10pt; background: #f8fafc; padding: 12px 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin: 10px 0 16px; line-height: 1.7; }
+    .footer { text-align: center; font-size: 9pt; color: #94a3b8; margin-top: 40px; padding-top: 12px; border-top: 1px solid #e2e8f0; }
+  </style>
+</head>
+<body>
+
+<!-- ==================== COVER PAGE ==================== -->
+<div class="cover">
+  <h1>📄 Resume Maker</h1>
+  <p class="subtitle">AI-Powered Resume & Cover Letter Generator</p>
+  <p class="subtitle" style="font-size:12pt; margin-top:40px;">Complete Application Documentation</p>
+  <p class="version">Version 1.0.0</p>
+  <p class="date">September 2026</p>
+</div>
+
+<!-- ==================== TABLE OF CONTENTS ==================== -->
+<h2>Table of Contents</h2>
+<ol style="font-size:11pt; line-height:2;">
+  <li>Overview</li>
+  <li>Features</li>
+  <li>Architecture & Project Structure</li>
+  <li>Tech Stack & Dependencies</li>
+  <li>Setup & Installation</li>
+  <li>Configuration (Environment Variables)</li>
+  <li>API Endpoints</li>
+  <li>Self-Hosting Guide (Docker)</li>
+  <li>Security Features</li>
+  <li>Health Monitoring</li>
+  <li>Template Customization</li>
+  <li>Troubleshooting</li>
+</ol>
+
+<!-- ==================== 1. OVERVIEW ==================== -->
+<div class="page-break"></div>
+<h2>1. Overview</h2>
+<p>
+  Resume Maker is an AI-powered web application that generates ATS-optimized resumes and personalized cover letters.
+  Users fill in their details, optionally provide a job description (via URL or pasted text), and the app uses the
+  <strong>Groq API</strong> (free Llama 3 / OpenAI OSS 120B model) to tailor the documents to the specific role.
+</p>
+<p>
+  The generated documents use clean, single-column HTML templates that parse well with Applicant Tracking Systems (ATS),
+  and can be downloaded as professional PDFs.
+</p>
+
+<div class="note">
+  <strong>Key advantage:</strong> The Groq API is completely free — no credit card required. It provides access to
+  OpenAI OSS 120B (comparable to GPT-4) with fast inference speeds.
+</div>
+
+<!-- ==================== 2. FEATURES ==================== -->
+<h2>2. Features</h2>
+<table>
+  <tr><th>Feature</th><th>Description</th></tr>
+  <tr><td><strong>CV Import</strong></td><td>Upload an existing PDF/DOCX/TXT resume; AI parses it and pre-fills the form</td></tr>
+  <tr><td><strong>Job Description Input</strong></td><td>Paste a job posting URL or paste the full job description text directly</td></tr>
+  <tr><td><strong>AI-Tailored Resumes</strong></td><td>AI rewrites summary and experience with keywords from the job description</td></tr>
+  <tr><td><strong>Cover Letter Generation</strong></td><td>Personalized cover letters matched to the specific role</td></tr>
+  <tr><td><strong>ATS-Friendly Templates</strong></td><td>Single-column, clean HTML templates optimized for ATS parsers</td></tr>
+  <tr><td><strong>PDF Export</strong></td><td>Download individual or combined PDFs (resume + cover letter)</td></tr>
+  <tr><td><strong>GitHub Integration</strong></td><td>Fetch GitHub repos and add selected projects to your resume</td></tr>
+  <tr><td><strong>Academic Document Parsing</strong></td><td>Upload transcripts to auto-fill education fields</td></tr>
+  <tr><td><strong>Self-Hosting Ready</strong></td><td>Docker containerization with Nginx reverse proxy</td></tr>
+  <tr><td><strong>Production Security</strong></td><td>Helmet headers, rate limiting, secure sessions, health checks</td></tr>
+</table>
+
+<!-- ==================== 3. ARCHITECTURE ==================== -->
+<div class="page-break"></div>
+<h2>3. Architecture & Project Structure</h2>
+
+<div class="tree">
+resume-maker/<br>
+├── server.js               # Express server & all routes<br>
+├── package.json             # Dependencies & scripts<br>
+├── Dockerfile               # Multi-stage Docker build<br>
+├── docker-compose.yml       # Docker Compose orchestration<br>
+├── .env                     # Environment variables (not committed)<br>
+├── .env.example             # Environment template<br>
+├── .env.production          # Production environment template<br>
+├── .dockerignore            # Docker build exclusions<br>
+├── nginx/<br>
+│   ├── nginx.conf           # Main Nginx config (gzip, rate limiting, security headers)<br>
+│   └── conf.d/<br>
+│       └── default.conf     # Server blocks (HTTP + HTTPS template)<br>
+├── lib/<br>
+│   ├── ai.js                # Groq/Llama 3 AI integration<br>
+│   ├── scraper.js           # Job description URL scraper<br>
+│   ├── templates.js         # ATS-friendly HTML resume & cover letter templates<br>
+│   ├── pdf.js               # PDF generation with Puppeteer<br>
+│   ├── document-parser.js   # PDF/DOCX text extraction & AI parsing<br>
+│   └── github.js            # GitHub API integration (repos, READMEs)<br>
+├── public/<br>
+│   ├── index.html           # Main input form<br>
+│   ├── preview.html         # Side-by-side resume/cover letter preview<br>
+│   ├── css/style.css        # Application styles<br>
+│   └── js/app.js            # Client-side JavaScript (form handling, uploads, GitHub)<br>
+├── output/                  # Temporary PDF files (auto-cleaned after download)<br>
+├── uploads/                 # Uploaded documents (auto-cleaned after parsing)<br>
+└── docs/<br>
+    └── documentation.html   # This document<br>
+</div>
+
+<h3>Request Flow</h3>
+<ol>
+  <li>User fills in personal info, education, experience, and skills on the form</li>
+  <li>User provides a job description (URL or pasted text)</li>
+  <li>On submit, the server scrapes the URL (if provided) or uses the pasted text</li>
+  <li>The AI (Groq API) generates a tailored resume and cover letter</li>
+  <li>User previews both documents side-by-side</li>
+  <li>User downloads individual or combined PDFs</li>
+</ol>
+
+<!-- ==================== 4. TECH STACK ==================== -->
+<h2>4. Tech Stack & Dependencies</h2>
+
+<h3>Runtime</h3>
+<table>
+  <tr><th>Technology</th><th>Version</th><th>Purpose</th></tr>
+  <tr><td>Node.js</td><td>18+</td><td>JavaScript runtime</td></tr>
+  <tr><td>Express</td><td>^4.18.0</td><td>Web framework & routing</td></tr>
+  <tr><td>express-session</td><td>^1.18.0</td><td>Server-side session management</td></tr>
+  <tr><td>helmet</td><td>^8.3.0</td><td>HTTP security headers</td></tr>
+  <tr><td>express-rate-limit</td><td>^8.7.0</td><td>Request rate limiting</td></tr>
+  <tr><td>dotenv</td><td>^16.4.0</td><td>Environment variable loading</td></tr>
+</table>
+
+<h3>AI & Processing</h3>
+<table>
+  <tr><th>Technology</th><th>Version</th><th>Purpose</th></tr>
+  <tr><td>OpenAI SDK</td><td>^4.50.0</td><td>Groq API client (OpenAI-compatible)</td></tr>
+  <tr><td>Puppeteer</td><td>^25.9.0</td><td>PDF generation via headless Chromium</td></tr>
+  <tr><td>pdf-parse</td><td>^2.4.5</td><td>Extract text from uploaded PDFs</td></tr>
+  <tr><td>mammoth</td><td>^1.12.2</td><td>Extract text from uploaded DOCX files</td></tr>
+</table>
+
+<h3>Web Scraping & HTTP</h3>
+<table>
+  <tr><th>Technology</th><th>Version</th><th>Purpose</th></tr>
+  <tr><td>axios</td><td>^1.7.0</td><td>HTTP client for scraping & GitHub API</td></tr>
+  <tr><td>cheerio</td><td>^1.0.0</td><td>HTML parsing (jQuery-like) for job scraping</td></tr>
+  <tr><td>multer</td><td>^2.3.0</td><td>File upload handling (multipart/form-data)</td></tr>
+</table>
+
+<h3>Dev Dependencies</h3>
+<table>
+  <tr><th>Technology</th><th>Version</th><th>Purpose</th></tr>
+  <tr><td>nodemon</td><td>^3.1.0</td><td>Auto-restart server on file changes</td></tr>
+</table>
+
+<!-- ==================== 5. SETUP ==================== -->
+<div class="page-break"></div>
+<h2>5. Setup & Installation</h2>
+
+<h3>Prerequisites</h3>
+<ul>
+  <li>Node.js v18 or higher</li>
+  <li>A free Groq API key from <code>console.groq.com</code></li>
+  <li>npm (comes with Node.js)</li>
+</ul>
+
+<h3>Development Setup</h3>
+<pre><code># Clone the repository
+git clone https://github.com/your-username/resume-maker.git
+cd resume-maker
+
+# Install dependencies
+npm install
+
+# Create environment file
+cp .env.example .env
+
+# Edit .env and add your Groq API key
+# GROQ_API_KEY=gsk_your_key_here
+
+# Start development server (with auto-reload)
+npm run dev
+
+# Or start without auto-reload
+npm start</code></pre>
+
+<p>Open <code>http://localhost:3000</code> in your browser.</p>
+
+<div class="note">
+  <strong>Getting a Groq API Key:</strong> Visit <code>console.groq.com</code>, sign up (free, no credit card),
+  create an API key, and paste it into your <code>.env</code> file.
+</div>
+
+<!-- ==================== 6. CONFIGURATION ==================== -->
+<h2>6. Configuration (Environment Variables)</h2>
+
+<table>
+  <tr><th>Variable</th><th>Description</th><th>Default</th><th>Required</th></tr>
+  <tr><td><code>GROQ_API_KEY</code></td><td>Your Groq API key for AI generation</td><td>—</td><td>Yes</td></tr>
+  <tr><td><code>PORT</code></td><td>Server port number</td><td>3000</td><td>No</td></tr>
+  <tr><td><code>SESSION_SECRET</code></td><td>Secret for session encryption</td><td>—</td><td>Yes (production)</td></tr>
+  <tr><td><code>NODE_ENV</code></td><td>Environment mode: <code>development</code> or <code>production</code></td><td>development</td><td>No</td></tr>
+  <tr><td><code>TRUST_PROXY</code></td><td>Set to <code>1</code> when behind Nginx reverse proxy</td><td>—</td><td>No</td></tr>
+  <tr><td><code>RATE_LIMIT_WINDOW_MS</code></td><td>Rate limit window in milliseconds</td><td>900000 (15 min)</td><td>No</td></tr>
+  <tr><td><code>RATE_LIMIT_MAX_REQUESTS</code></td><td>Max requests per IP per window</td><td>100</td><td>No</td></tr>
+</table>
+
+<h3>Generating a Secure Session Secret</h3>
+<pre><code>node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"</code></pre>
+
+<h3>.env.example</h3>
+<pre><code># Groq API Key (free) - get yours at https://console.groq.com
+GROQ_API_KEY=your_groq_api_key_here
+
+# Server Port
+PORT=3000
+
+# Session Secret
+SESSION_SECRET=your_session_secret_here
+
+# Node Environment
+NODE_ENV=development
+
+# Trust proxy (set to 1 behind Nginx)
+# TRUST_PROXY=1</code></pre>
+
+<!-- ==================== 7. API ENDPOINTS ==================== -->
+<div class="page-break"></div>
+<h2>7. API Endpoints</h2>
+
+<table>
+  <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+  <tr><td><code>GET</code></td><td><code>/</code></td><td>Home page — input form</td></tr>
+  <tr><td><code>POST</code></td><td><code>/generate</code></td><td>Process form → generate resume + cover letter</td></tr>
+  <tr><td><code>GET</code></td><td><code>/preview</code></td><td>Side-by-side preview of resume & cover letter</td></tr>
+  <tr><td><code>GET</code></td><td><code>/health</code></td><td>Health check endpoint (JSON response)</td></tr>
+  <tr><td colspan="3" style="background:#f1f5f9; font-weight:600;">API Endpoints</td></tr>
+  <tr><td><code>GET</code></td><td><code>/api/resume-html</code></td><td>Get rendered resume HTML</td></tr>
+  <tr><td><code>GET</code></td><td><code>/api/cover-letter-html</code></td><td>Get rendered cover letter HTML</td></tr>
+  <tr><td><code>POST</code></td><td><code>/api/parse-academic</code></td><td>Upload academic document → extract education info</td></tr>
+  <tr><td><code>POST</code></td><td><code>/api/parse-cv</code></td><td>Upload existing CV → extract all structured data</td></tr>
+  <tr><td><code>GET</code></td><td><code>/api/github/repos/:username</code></td><td>Fetch public GitHub repositories for a user</td></tr>
+  <tr><td><code>POST</code></td><td><code>/api/github/build-projects</code></td><td>Build formatted projects text from selected repos</td></tr>
+  <tr><td colspan="3" style="background:#f1f5f9; font-weight:600;">Download Endpoints</td></tr>
+  <tr><td><code>GET</code></td><td><code>/download/resume</code></td><td>Download resume as PDF</td></tr>
+  <tr><td><code>GET</code></td><td><code>/download/cover-letter</code></td><td>Download cover letter as PDF</td></tr>
+  <tr><td><code>GET</code></td><td><code>/download/both</code></td><td>Download both PDFs sequentially</td></tr>
+</table>
+
+<h3>POST /generate — Request Body</h3>
+<table>
+  <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+  <tr><td><code>full_name</code></td><td>string</td><td>Yes</td><td>Full name</td></tr>
+  <tr><td><code>email</code></td><td>string</td><td>Yes</td><td>Email address</td></tr>
+  <tr><td><code>phone</code></td><td>string</td><td>Yes</td><td>Phone number</td></tr>
+  <tr><td><code>location</code></td><td>string</td><td>No</td><td>City, State/Country</td></tr>
+  <tr><td><code>linkedin</code></td><td>string</td><td>No</td><td>LinkedIn profile URL</td></tr>
+  <tr><td><code>summary</code></td><td>string</td><td>No</td><td>Professional summary</td></tr>
+  <tr><td><code>job_url</code></td><td>string</td><td>No</td><td>Job posting URL to scrape</td></tr>
+  <tr><td><code>job_text</code></td><td>string</td><td>No</td><td>Pasted job description text (preferred if URL fails)</td></tr>
+  <tr><td><code>edu_school[]</code></td><td>string[]</td><td>Yes</td><td>School/university names</td></tr>
+  <tr><td><code>edu_degree[]</code></td><td>string[]</td><td>Yes</td><td>Degree types</td></tr>
+  <tr><td><code>edu_field[]</code></td><td>string[]</td><td>No</td><td>Fields of study</td></tr>
+  <tr><td><code>edu_gpa[]</code></td><td>string[]</td><td>No</td><td>GPAs</td></tr>
+  <tr><td><code>edu_start[]</code></td><td>string[]</td><td>No</td><td>Start dates</td></tr>
+  <tr><td><code>edu_end[]</code></td><td>string[]</td><td>No</td><td>End dates</td></tr>
+  <tr><td><code>exp_company[]</code></td><td>string[]</td><td>Yes</td><td>Company names</td></tr>
+  <tr><td><code>exp_title[]</code></td><td>string[]</td><td>Yes</td><td>Job titles</td></tr>
+  <tr><td><code>exp_start[]</code></td><td>string[]</td><td>No</td><td>Start dates</td></tr>
+  <tr><td><code>exp_end[]</code></td><td>string[]</td><td>No</td><td>End dates</td></tr>
+  <tr><td><code>exp_description[]</code></td><td>string[]</td><td>No</td><td>Role descriptions</td></tr>
+  <tr><td><code>skills</code></td><td>string</td><td>No</td><td>Comma-separated skills</td></tr>
+  <tr><td><code>certifications</code></td><td>string</td><td>No</td><td>Certifications</td></tr>
+  <tr><td><code>projects</code></td><td>string</td><td>No</td><td>Projects description</td></tr>
+</table>
+
+<h3>GET /health — Response</h3>
+<pre><code>{
+  "status": "ok",
+  "timestamp": "2026-09-12T00:00:00.000Z",
+  "uptime": 12345.678,
+  "memoryUsage": { "rss": ..., "heapTotal": ..., "heapUsed": ... },
+  "cpuUsage": { "user": ..., "system": ... },
+  "environment": "production",
+  "version": "1.0.0"
+}</code></pre>
+
+<!-- ==================== 8. SELF-HOSTING ==================== -->
+<div class="page-break"></div>
+<h2>8. Self-Hosting Guide (Docker)</h2>
+
+<h3>Option 1: Docker Compose (Recommended)</h3>
+<pre><code># 1. Clone and enter the project
+git clone https://github.com/your-username/resume-maker.git
+cd resume-maker
+
+# 2. Create environment file
+cp .env.production .env
+# Edit .env with your GROQ_API_KEY and SESSION_SECRET
+
+# 3. Start everything (app + Nginx reverse proxy)
+docker-compose up -d
+
+# 4. Verify
+docker-compose ps
+curl http://localhost/health
+
+# 5. View logs
+docker-compose logs -f</code></pre>
+
+<p>The app will be accessible at:</p>
+<ul>
+  <li><strong>HTTP:</strong> <code>http://your-server-ip</code> (port 80 via Nginx)</li>
+  <li><strong>Direct:</strong> <code>http://your-server-ip:3000</code> (bypassing Nginx)</li>
+  <li><strong>Health Check:</strong> <code>http://your-server-ip/health</code></li>
+</ul>
+
+<h3>Option 2: Docker Only (No Nginx)</h3>
+<pre><code># Build
+docker build -t resume-maker .
+
+# Run
+docker run -d \
+  --name resume-maker \
+  -p 3000:3000 \
+  -e GROQ_API_KEY=your_key \
+  -e NODE_ENV=production \
+  -e SESSION_SECRET=your_secret \
+  resume-maker</code></pre>
+
+<h3>Option 3: Manual Deployment (No Docker)</h3>
+<pre><code># Install production dependencies
+npm ci --only=production
+
+# Set environment variables
+export NODE_ENV=production
+export GROQ_API_KEY=your_key
+export SESSION_SECRET=your_secret
+
+# Start
+node server.js</code></pre>
+
+<h3>SSL/TLS (HTTPS)</h3>
+<ol>
+  <li>Obtain SSL certificates (e.g., Let's Encrypt with Certbot)</li>
+  <li>Place them in <code>nginx/ssl/</code> as <code>fullchain.pem</code> and <code>privkey.pem</code></li>
+  <li>Uncomment the HTTPS server block in <code>nginx/conf.d/default.conf</code></li>
+  <li>Update <code>server_name</code> to your domain</li>
+  <li>Restart: <code>docker-compose restart nginx</code></li>
+</ol>
+
+<!-- ==================== 9. SECURITY ==================== -->
+<h2>9. Security Features</h2>
+<table>
+  <tr><th>Feature</th><th>Implementation</th><th>Details</th></tr>
+  <tr><td>Security Headers</td><td>Helmet.js</td><td>X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, CSP, HSTS, and more</td></tr>
+  <tr><td>Rate Limiting</td><td>express-rate-limit</td><td>General: 100 req/15min. API: 50 req/15min. Configurable via env vars.</td></tr>
+  <tr><td>Secure Sessions</td><td>express-session</td><td>HTTP-only cookies, secure flag in production, 24h expiry</td></tr>
+  <tr><td>Trust Proxy</td><td>Express setting</td><td>Supports X-Forwarded-For when behind Nginx</td></tr>
+  <tr><td>Non-root Container</td><td>Dockerfile</td><td>App runs as <code>appuser</code>, not root</td></tr>
+  <tr><td>Resource Limits</td><td>Docker Compose</td><td>1GB memory, 1 CPU core max</td></tr>
+  <tr><td>Capability Dropping</td><td>Docker Compose</td><td>All capabilities dropped except NET_BIND_SERVICE</td></tr>
+  <tr><td>Nginx Headers</td><td>nginx.conf</td><td>X-Frame-Options, X-Content-Type-Options, X-XSS-Protection, Referrer-Policy</td></tr>
+</table>
+
+<!-- ==================== 10. MONITORING ==================== -->
+<div class="page-break"></div>
+<h2>10. Health Monitoring</h2>
+
+<h3>Health Check Endpoint</h3>
+<p>Available at <code>GET /health</code>, returns JSON with:</p>
+<ul>
+  <li><code>status</code>: "ok" or "degraded"</li>
+  <li><code>timestamp</code>: Current server time</li>
+  <li><code>uptime</code>: Seconds since server start</li>
+  <li><code>memoryUsage</code>: RSS, heap total, heap used</li>
+  <li><code>cpuUsage</code>: User and system CPU time</li>
+  <li><code>environment</code>: "development" or "production"</li>
+  <li><code>version</code>: App version from package.json</li>
+</ul>
+
+<p>Auto-degrades to <code>"degraded"</code> if essential directories are missing or memory usage exceeds 80%.</p>
+
+<h3>Docker Health Checks</h3>
+<p>Both the app container and Nginx container have built-in health checks that run every 30 seconds. Docker will automatically restart unhealthy containers.</p>
+
+<h3>Recommended Monitoring Tools</h3>
+<ul>
+  <li>Uptime Robot (free tier available)</li>
+  <li>Pingdom</li>
+  <li>Prometheus + Grafana</li>
+  <li>Nagios</li>
+</ul>
+
+<!-- ==================== 11. TEMPLATES ==================== -->
+<h2>11. Template Customization</h2>
+
+<p>The resume and cover letter templates are defined in <code>lib/templates.js</code>.</p>
+
+<h3>Resume Template</h3>
+<ul>
+  <li>Single-column layout (ATS-optimal)</li>
+  <li>Standard fonts: Calibri, Arial, Helvetica Neue</li>
+  <li>Sections: Header (name + contact), Summary, Experience, Education, Skills, Projects, Certifications</li>
+  <li>Clean section dividers with uppercase titles</li>
+  <li>Bullet points for experience descriptions</li>
+</ul>
+
+<h3>Cover Letter Template</h3>
+<ul>
+  <li>Same font family as resume</li>
+  <li>Sender info block at top</li>
+  <li>Auto-generated date</li>
+  <li>Paragraph-based body</li>
+  <li>Signature line at bottom</li>
+</ul>
+
+<h3>PDF Generation</h3>
+<p>PDFs are generated with Puppeteer (headless Chromium). Configuration in <code>lib/pdf.js</code>:</p>
+<ul>
+  <li>Format: A4</li>
+  <li>Margins: 0.4in on all sides</li>
+  <li>Background rendering enabled</li>
+  <li>Runs with <code>--no-sandbox</code> flag (Docker-compatible)</li>
+</ul>
+
+<!-- ==================== 12. TROUBLESHOOTING ==================== -->
+<div class="page-break"></div>
+<h2>12. Troubleshooting</h2>
+
+<table>
+  <tr><th>Problem</th><th>Solution</th></tr>
+  <tr>
+    <td><strong>Port 3000 already in use</strong></td>
+    <td>Change <code>PORT</code> in <code>.env</code>, or find and stop the process using that port: <code>lsof -i :3000</code> (Linux/Mac) or <code>netstat -ano | findstr :3000</code> (Windows)</td>
+  </tr>
+  <tr>
+    <td><strong>"Failed to fetch job description" (403)</strong></td>
+    <td>Many sites (LinkedIn, Indeed) block scraping. Use the "Paste Job Description" textarea instead of the URL field.</td>
+  </tr>
+  <tr>
+    <td><strong>PDF generation fails</strong></td>
+    <td>Ensure Puppeteer/Chromium is installed. In Docker, the Dockerfile handles this. Locally, run <code>npx puppeteer install</code>.</td>
+  </tr>
+  <tr>
+    <td><strong>"Cannot GET /"</strong></td>
+    <td>Server may not be running. Check <code>node server.js</code> output for errors.</td>
+  </tr>
+  <tr>
+    <td><strong>Docker permission issues</strong></td>
+    <td>Fix with: <code>chmod -R 755 uploads output</code></td>
+  </tr>
+  <tr>
+    <td><strong>Nginx 502 Bad Gateway</strong></td>
+    <td>The app container may be down. Check: <code>docker-compose ps</code> and <code>docker-compose logs app</code></td>
+  </tr>
+  <tr>
+    <td><strong>AI generation fails</strong></td>
+    <td>Verify your <code>GROQ_API_KEY</code> is valid and has quota. Check Groq dashboard at <code>console.groq.com</code>.</td>
+  </tr>
+  <tr>
+    <td><strong>File upload fails</strong></td>
+    <td>Max file size is 10MB. Supported formats: PDF, DOCX, TXT, MD, RTF, DOC.</td>
+  </tr>
+  <tr>
+    <td><strong>Session data lost</strong></td>
+    <td>Sessions are in-memory by default. Restarting the server clears all sessions. This is by design.</td>
+  </tr>
+</table>
+
+<div class="warning">
+  <strong>Important:</strong> Session data (generated resumes) is stored in-memory. It is lost when the server restarts.
+  This is a privacy feature — no user data is persisted permanently.
+</div>
+
+<div class="footer">
+  Resume Maker v1.0.0 — Documentation generated September 2026<br>
+  AI-Powered Resume & Cover Letter Generator
+</div>
+
+</body>
+</html>

@@ -1,0 +1,15 @@
+node_modules/
+# Never commit any environment file — only .env.example is tracked
+.env*
+!.env.example
+uploads/
+output/
+.sessions/
+# Docker
+.dockerignore
+# Nginx logs
+nginx/logs/
+# SSL certificates
+nginx/ssl/
+# Production builds
+*.log
